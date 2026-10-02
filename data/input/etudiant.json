@@ -1,0 +1,23 @@
+{
+  "nomScenario": "Parcours étudiant",
+  "saisie": {
+    "email": "etudiant.test@example.com",
+    "motDePasse": "Test@Etudiant2026!",
+    "civilite": "Mr",
+    "nom": "Dupont",
+    "prenom": "Jean",
+    "paysResidence": "Morocco",
+    "codePostal": "20000",
+    "ville": "Casablanca",
+    "telephone": "0600000000",
+    "profil": "Students",
+    "listesComplementaires": {
+      "Domaine d'études": "Computer Science",
+      "Niveau(x) d'étude": "Master 1"
+    },
+    "textesComplementaires": {}
+  },
+  "attendus": {
+    "champsVisibles": ["Domaine d'études", "Niveau(x) d'étude"]
+  }
+}

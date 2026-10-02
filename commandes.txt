@@ -1,0 +1,127 @@
+============================================================
+ TP3 - Tests automatisés Campus France (Playwright + POM)
+ Récapitulatif des commandes utilisées (PowerShell / Windows)
+============================================================
+
+Toutes les commandes se lancent depuis le dossier du projet :
+    cd "C:\Users\LOUCIF\projet playwright"
+
+
+------------------------------------------------------------
+1. INSTALLATION
+------------------------------------------------------------
+
+# Installer les dépendances du projet
+npm install
+
+# Installer les types Node (pour fs, path, process dans le code TypeScript)
+npm i -D @types/node
+
+# Installer le navigateur Chromium utilisé par Playwright
+npx playwright install chromium
+
+
+------------------------------------------------------------
+2. RÉCUPÉRER LES FICHIERS DU PROJET DEPUIS LE ZIP
+------------------------------------------------------------
+
+# Décompresser le zip dans un dossier temporaire
+Expand-Archive "$env:USERPROFILE\Downloads\projet-playwright.zip" -DestinationPath "$env:TEMP\pw" -Force
+
+# Copier les fichiers dans le projet
+Copy-Item "$env:TEMP\pw\projet-playwright\*" . -Recurse -Force
+Copy-Item "$env:TEMP\pw\projet-playwright\.github\workflows\playwright.yml" ".\.github\workflows\" -Force
+
+
+------------------------------------------------------------
+3. VÉRIFICATIONS
+------------------------------------------------------------
+
+# Lister les fichiers de test du projet (hors node_modules)
+Get-ChildItem -Recurse -Filter *.spec.ts | Where-Object FullName -notmatch node_modules | Select-Object FullName
+
+# Vérifier la présence des dossiers du projet
+Get-ChildItem tests, pages, utils, data\input
+
+# Lister les tests détectés par Playwright, sans les lancer
+npx playwright test --list
+
+# Vérifier qu'une correction est bien présente dans un fichier
+Select-String -Path .\pages\BasePage.ts -Pattern "selectize"
+Select-String -Path .\pages\RegisterPage.ts -Pattern "form#user-form"
+
+
+------------------------------------------------------------
+4. LANCER LES TESTS
+------------------------------------------------------------
+
+# Tous les tests
+npx playwright test
+
+# Un seul parcours (les guillemets sont obligatoires sous PowerShell,
+# car le @ est un caractère spécial)
+npx playwright test --grep "@etudiant"
+npx playwright test --grep "@chercheur"
+
+# Uniquement le fichier record.spec.ts (filtre sur le nom du fichier)
+npx playwright test record
+
+# Voir le navigateur pendant l'exécution (à ajouter à n'importe quelle commande)
+npx playwright test --headed
+npx playwright test --grep "@etudiant" --headed
+
+
+------------------------------------------------------------
+5. RÉSULTATS ET RAPPORTS
+------------------------------------------------------------
+
+# Ouvrir le rapport HTML de la dernière exécution
+npx playwright show-report output\rapport-html
+
+# Fichiers de sortie générés dans le dossier output :
+#   output\resultats-etudiant.csv / .json    -> détail des vérifications
+#   output\resultats-chercheur.csv / .json
+#   output\junit.xml                         -> rapport JUnit
+#   output\screenshots\                      -> captures d'écran
+#   output\test-results\                     -> captures et traces des échecs
+
+
+------------------------------------------------------------
+6. ENREGISTREUR ET DIAGNOSTIC
+------------------------------------------------------------
+
+# Enregistrer un parcours dans un fichier (écrit à la fermeture du navigateur)
+npx playwright codegen https://www.campusfrance.org/en/user/register -o tests/record.spec.ts
+
+# Lancer le test de diagnostic (structure de la page -> output\diagnostic.json)
+npx playwright test diagnostic --headed
+
+# Afficher l'essentiel du diagnostic dans le terminal
+$d = Get-Content output\diagnostic.json -Raw -Encoding UTF8 | ConvertFrom-Json
+$d.titre; $d.url
+$d.formulaires | Format-Table -AutoSize
+$d.labels | Where-Object visible | Format-Table texte, for -AutoSize
+$d.boutons | Where-Object visible | Format-Table -AutoSize
+
+
+------------------------------------------------------------
+7. RANGEMENT (facultatif)
+------------------------------------------------------------
+
+# Sortir l'enregistrement du dossier tests (il ne sera plus lancé en CI)
+New-Item -ItemType Directory -Force enregistrement
+Move-Item tests\record.spec.ts enregistrement\
+
+
+------------------------------------------------------------
+8. INTÉGRATION CONTINUE (GitHub Actions)
+------------------------------------------------------------
+
+# Envoyer le projet sur GitHub : le workflow .github/workflows/playwright.yml
+# se lance automatiquement à chaque push sur main/master
+git add .
+git commit -m "TP3 - tests Playwright POM Campus France"
+git push
+
+# Les résultats sont ensuite visibles sur GitHub :
+#   onglet Actions -> dernier run -> artefact "resultats-tests" (dossier output)

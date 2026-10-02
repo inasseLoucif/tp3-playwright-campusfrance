@@ -1,0 +1,9 @@
+{
+  "url": "https://www.campusfrance.org/en/user/register",
+  "attendus": {
+    "titreSection": "Informations complémentaires",
+    "libelleBouton": "CREATE AN ACCOUNT",
+    "libelleCaseRgpd": "J’accepte que mes données soient traitées",
+    "caseRgpdCochee": false
+  }
+}

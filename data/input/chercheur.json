@@ -1,0 +1,22 @@
+{
+  "nomScenario": "Parcours chercheur",
+  "saisie": {
+    "email": "chercheur.test@example.com",
+    "motDePasse": "Test@Chercheur2026!",
+    "civilite": "Mme",
+    "nom": "Martin",
+    "prenom": "Claire",
+    "paysResidence": "Tunisia",
+    "codePostal": "1000",
+    "ville": "Tunis",
+    "telephone": "0700000000",
+    "profil": "Researcher",
+    "listesComplementaires": {
+      "Domaine d'études": "Physics"
+    },
+    "textesComplementaires": {}
+  },
+  "attendus": {
+    "champsVisibles": ["Domaine d'études", "Niveau(x) d'étude"]
+  }
+}
