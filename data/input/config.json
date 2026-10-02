@@ -1,5 +1,5 @@
 {
-  "url": "https://www.campusfrance.org/en/user/register",
+  "chemin": "/en/user/register",
   "attendus": {
     "titreSection": "Informations complémentaires",
     "libelleBouton": "CREATE AN ACCOUNT",

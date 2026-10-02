@@ -1,8 +1,9 @@
 // Scénarios : uniquement des appels au Page Object + des assertions.
-// Entrées : data/input/*.json   |   Sorties : output/
+// Entrées : .env (environnement) + data/input/*.json   |   Sorties : output/
 import { expect, Page, test } from '@playwright/test';
 import { RegisterPage } from '../pages/RegisterPage';
 import { chargerConfig, chargerProfil } from '../utils/dataLoader';
+import { BASE_URL, ENV } from '../utils/environnement';
 import { Rapport } from '../utils/rapport';
 import { normaliser } from '../utils/texte';
 
@@ -12,7 +13,7 @@ async function executerParcours(page: Page, nomProfil: string) {
   const profil = chargerProfil(nomProfil);
   const s = profil.saisie;
   const attendus = config.attendus;
-  const rapport = new Rapport(profil.nomScenario, nomProfil);
+  const rapport = new Rapport(profil.nomScenario, nomProfil, ENV);
   const inscription = new RegisterPage(page);
 
   const verifier = (nom: string, attendu: unknown, obtenu: unknown, ok = attendu === obtenu) => {
@@ -21,8 +22,8 @@ async function executerParcours(page: Page, nomProfil: string) {
   };
 
   try {
-    await test.step('Ouvrir la page d\'inscription', async () => {
-      await inscription.charger(config.url);
+    await test.step(`Ouvrir la page d'inscription (${BASE_URL}${config.chemin})`, async () => {
+      await inscription.charger(config.chemin);
     });
     await test.step('Remplir les informations de connexion', async () => {
       await inscription.remplirInformationsConnexion(s.email, s.motDePasse);
@@ -33,7 +34,7 @@ async function executerParcours(page: Page, nomProfil: string) {
     await test.step(`Choisir le profil "${s.profil}" et compléter`, async () => {
       await inscription.choisirProfil(s.profil);
       await inscription.remplirInformationsComplementaires(s.listesComplementaires, s.textesComplementaires);
-      await inscription.capture(`${nomProfil}-formulaire-rempli`);
+      await inscription.capture(`${ENV}-${nomProfil}-formulaire-rempli`);
     });
     // Le formulaire n'est JAMAIS soumis : aucun vrai compte n'est créé
     await test.step('Vérifications', async () => {
@@ -53,12 +54,18 @@ async function executerParcours(page: Page, nomProfil: string) {
   }
 }
 
-test.describe('Inscription Campus France', () => {
-  test('Parcours étudiant @etudiant', async ({ page }) => {
-    await executerParcours(page, 'etudiant');
+test.describe(`Inscription Campus France [${ENV.toUpperCase()}]`, () => {
+
+  test.describe('Parcours étudiant', () => {
+    test('Vérifications du formulaire @etudiant', async ({ page }) => {
+      await executerParcours(page, 'etudiant');
+    });
   });
 
-  test('Parcours chercheur @chercheur', async ({ page }) => {
-    await executerParcours(page, 'chercheur');
+  test.describe('Parcours chercheur', () => {
+    test('Vérifications du formulaire @chercheur', async ({ page }) => {
+      await executerParcours(page, 'chercheur');
+    });
   });
+
 });

@@ -84,8 +84,16 @@ npx playwright show-report output\rapport-html
 #   output\junit.xml                         -> rapport JUnit
 #   output\screenshots\                      -> captures d'écran
 #   output\test-results\                     -> captures et traces des échecs
-
-
+ensemble des tests 
+un test 
+unn test sur un env 
+un test su rune config
+hooks
+beforeEach
+before All
+after Each
+describe c'est comme une suite de tests
+refactoring
 ------------------------------------------------------------
 6. ENREGISTREUR ET DIAGNOSTIC
 ------------------------------------------------------------

@@ -1,4 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import { BASE_URL, ENV } from './utils/environnement';
+
+console.log(`Environnement : ${ENV.toUpperCase()} → ${BASE_URL}`);
 
 export default defineConfig({
   testDir: './tests',
@@ -18,6 +21,7 @@ export default defineConfig({
   ],
 
   use: {
+    baseURL: BASE_URL,          // URL de l'environnement choisi (QA, PP ou PROD)
     locale: 'en-US',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',

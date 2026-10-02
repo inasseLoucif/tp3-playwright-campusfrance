@@ -6,6 +6,19 @@ on:
   pull_request:
     branches: [main, master]
   workflow_dispatch:
+    inputs:
+      environnement:
+        description: 'Environnement à tester'
+        type: choice
+        options: [qa, pp, prod]
+        default: qa
+
+# Variables d'environnement (équivalent du fichier .env, qui n'est pas envoyé sur GitHub)
+env:
+  ENV: ${{ inputs.environnement || 'qa' }}
+  URL_QA: https://www.campusfrance.org
+  URL_PP: https://www.campusfrance.org
+  URL_PROD: https://www.campusfrance.org
 
 jobs:
   test:
@@ -28,13 +41,13 @@ jobs:
       - name: Installer Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: Lancer les deux parcours
+      - name: Lancer les tests (environnement ${{ env.ENV }})
         run: npx playwright test
 
       - name: Publier les fichiers de sortie
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: resultats-tests
+          name: resultats-${{ env.ENV }}
           path: output/
           retention-days: 30
