@@ -16,8 +16,8 @@ on:
 # Variables d'environnement (équivalent du fichier .env, qui n'est pas envoyé sur GitHub)
 env:
   ENV: ${{ inputs.environnement || 'qa' }}
-  URL_QA: https://www.campusfrance.org
-  URL_PP: https://www.campusfrance.org
+  URL_QA: https://www.campusfrance-qa.org
+  URL_PP: https://www.campusfrance-pp.org
   URL_PROD: https://www.campusfrance.org
 
 jobs:
