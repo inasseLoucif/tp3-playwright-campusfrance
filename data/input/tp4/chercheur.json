@@ -1,0 +1,15 @@
+{
+  "nomScenario": "Parcours chercheur",
+  "saisie": {
+    "email": "chercheur.test@example.com",
+    "motDePasse": "Test@Chercheur2026!",
+    "civilite": "Mme",
+    "nom": "Martin",
+    "prenom": "Claire",
+    "profil": "Researcher",
+    "nationalites": ["Tunisia", "Canada", "France"]
+  },
+  "attendus": {
+    "nombreChampsNationalite": 3
+  }
+}

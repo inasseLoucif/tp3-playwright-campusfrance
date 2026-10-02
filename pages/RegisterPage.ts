@@ -2,7 +2,7 @@
 // Les localisateurs sont déclarés UNE seule fois ici ; les tests n'en contiennent aucun.
 import { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
-import { Saisie } from '../utils/types';
+import { Identite, Saisie } from '../utils/types';
 
 const echapperRegex = (t: string) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -19,6 +19,9 @@ export class RegisterPage extends BasePage {
   readonly ville: Locator;
   readonly telephone: Locator;
   readonly boutonCreer: Locator;
+  readonly libelleEmail: Locator;
+  readonly champsNationalite: Locator;
+  readonly boutonAjoutNationalite: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -38,6 +41,10 @@ export class RegisterPage extends BasePage {
     this.ville = f.locator('input[name="field_ville[0][value]"]');
     this.telephone = f.locator('input[name="field_telephone[0][value]"]');
     this.boutonCreer = f.locator('input[type="submit"][name="op"]');
+        this.libelleEmail = f.locator('label[for="edit-name"]');
+    // Une ligne par nationalité : field_nationalite[0][target_id], [1], [2]...
+    this.champsNationalite = f.locator('input[name^="field_nationalite["][name$="[target_id]"]');
+    this.boutonAjoutNationalite = f.locator('input[name="field_nationalite_add_more"]');
   }
 
   /** Libellé du formulaire dont le texte est exactement celui donné */
@@ -109,5 +116,52 @@ export class RegisterPage extends BasePage {
 
   async caseEstCochee(libelle: string): Promise<boolean> {
     return this.formulaire.getByLabel(libelle, { exact: false }).isChecked();
+  }
+    // ---------- TP4 ----------
+  champNationalite(index: number): Locator {
+    return this.formulaire.locator(`input[name="field_nationalite[${index}][target_id]"]`);
+  }
+
+  async remplirIdentite(s: Identite) {
+    await this.remplirInformationsConnexion(s.email, s.motDePasse);
+    await this.cocherRadio(await this.champParLibelle(s.civilite));
+    await this.saisir(this.nom, s.nom);
+    await this.saisir(this.prenom, s.prenom);
+  }
+
+  async saisirNationalite(index: number, valeur: string) {
+    const champ = this.champNationalite(index);
+    await this.saisir(champ, valeur);
+    await champ.press('Escape');            // ferme la liste d'autocomplétion
+  }
+
+  /** Clique sur "Add another item" et renvoie le nombre de champs avant / après */
+  async ajouterNationalite(): Promise<{ avant: number; apres: number }> {
+    const avant = await this.champsNationalite.count();
+    await this.cliquer(this.boutonAjoutNationalite);
+    await this.attendreNombre(this.champsNationalite, avant + 1);
+    const apres = await this.champsNationalite.count();
+    return { avant, apres };
+  }
+
+  async texteLibelleEmail(): Promise<string> {
+    return this.texte(this.libelleEmail);
+  }
+
+  async texteBoutonAjout(): Promise<string> {
+    return (await this.boutonAjoutNationalite.inputValue()).trim();
+  }
+
+  async boutonAjoutUtilisable(): Promise<boolean> {
+    return (await this.estVisible(this.boutonAjoutNationalite)) && this.boutonAjoutNationalite.isEnabled();
+  }
+
+  async nombreChampsNationalite(): Promise<number> {
+    return this.champsNationalite.count();
+  }
+
+  async valeursNationalites(): Promise<string[]> {
+    return this.champsNationalite.evaluateAll(champs =>
+      champs.map(c => (c as HTMLInputElement).value.trim()));
   }
 }

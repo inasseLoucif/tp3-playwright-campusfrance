@@ -1,0 +1,15 @@
+{
+  "nomScenario": "Parcours étudiant",
+  "saisie": {
+    "email": "etudiant.test@example.com",
+    "motDePasse": "Test@Etudiant2026!",
+    "civilite": "Mr",
+    "nom": "Dupont",
+    "prenom": "Jean",
+    "profil": "Students",
+    "nationalites": ["Algeria", "France"]
+  },
+  "attendus": {
+    "nombreChampsNationalite": 2
+  }
+}

@@ -62,7 +62,25 @@ export class BasePage {
   async estVisible(element: Locator, timeout = 5000): Promise<boolean> {
     return element.first().waitFor({ state: 'visible', timeout }).then(() => true).catch(() => false);
   }
+  /** Clic robuste : centre l'élément (évite l'en-tête fixe du site), puis clique */
+  async cliquer(element: Locator) {
+    await element.evaluate(e => e.scrollIntoView({ block: 'center' }));
+    try {
+      await element.click({ timeout: 5000 });
+    } catch {
+      await element.click({ force: true });
+    }
+  }
 
+  async texte(element: Locator): Promise<string> {
+    return (await element.innerText()).trim();
+  }
+
+  /** Attend qu'un localisateur corresponde à N éléments ; renvoie false si le délai expire */
+  async attendreNombre(element: Locator, nombre: number, timeout = 15000): Promise<boolean> {
+    return expect(element).toHaveCount(nombre, { timeout }).then(() => true).catch(() => false);
+  }
+  
   async capture(nom: string) {
     await this.page.screenshot({ path: path.join(OUTPUT_DIR, 'screenshots', `${nom}.png`), fullPage: true });
   }
